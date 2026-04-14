@@ -135,7 +135,7 @@ body{font-family:var(--font);background:var(--bg3);display:flex;align-items:cent
 <body>
 <div id="app">
   <div id="hdr">
-    <span class="brand">Valt <em>OS</em></span>
+    <span class="brand" onclick="reset()" style="cursor:pointer;" title="Back to start">Valt <em>OS</em></span>
     <div class="hsp"></div>
     <span id="ftag"></span>
     <div class="alive"><div class="alit"></div></div>
@@ -252,6 +252,7 @@ function renderNetwork(){
   <div class="sec-lbl ai">Affinity-matched partners \u2014 click any to draft a message</div>
   <div class="pgrid ai">${pg}</div>`;
 }
+function reset(){if(ci){ci.destroy();ci=null;}flow=null;document.getElementById("empty").classList.remove("hide");document.getElementById("built").style.display="none";document.getElementById("built").innerHTML="";document.getElementById("ftag").textContent="";document.getElementById("chips").innerHTML="";document.getElementById("hdr").classList.remove("vis");}
 function toggleMic(){
   const btn=document.getElementById('mic'),inp=document.getElementById('inp');
   if(micTimer){clearTimeout(micTimer);micTimer=null;btn.classList.remove('on');inp.placeholder='Ask anything\u2026';return;}
