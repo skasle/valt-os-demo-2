@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valt OS — Private Market Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff;--bg2:#f4f3ee;--bg3:#eae9e3;
+  --t1:#1a1a17;--t2:#686860;--t3:#a0a099;
+  --bd:rgba(0,0,0,0.09);--bd2:rgba(0,0,0,0.15);
+  --r-md:8px;--r-lg:12px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#141412;--bg2:#1e1e1b;--bg3:#272724;
+  --t1:#f0efe8;--t2:#8a8a82;--t3:#4e4e48;
+  --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.14);
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg3);display:flex;align-items:center;justify-content:center;padding:20px;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+@keyframes blink{0%,80%,100%{opacity:.15;}40%{opacity:1;}}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+@keyframes micpulse{0%,100%{transform:translateY(-50%) scale(1);}50%{transform:translateY(-50%) scale(1.18);}}
+#app{width:100%;max-width:900px;height:calc(100vh - 40px);min-height:560px;display:flex;flex-direction:column;background:var(--bg);border:.5px solid var(--bd);border-radius:var(--r-lg);overflow:hidden;}
+#hdr{height:36px;flex-shrink:0;display:flex;align-items:center;padding:0 16px;border-bottom:.5px solid var(--bd);opacity:0;transition:opacity .3s;}
+#hdr.vis{opacity:1;}
+.brand{font-size:12px;font-weight:500;color:var(--t1);letter-spacing:-.3px;}
+.brand em{font-style:normal;color:#1D9E75;}
+.hsp{flex:1;}
+#ftag{font-size:9px;color:var(--t3);letter-spacing:.3px;}
+.alive{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);margin-right:8px;}
+.alit{width:5px;height:5px;border-radius:50%;background:#1D9E75;animation:pulse 2.4s infinite;}
+.av{width:18px;height:18px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:500;color:#3C3489;}
+#content{flex:1;overflow-y:auto;position:relative;}
+#empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .25s;}
+#empty.hide{opacity:0;pointer-events:none;}
+.g1{font-size:24px;font-weight:500;color:var(--t1);letter-spacing:-.4px;}
+.g2{font-size:14px;color:var(--t2);margin-top:8px;}
+#esug{display:flex;flex-direction:column;gap:8px;margin-top:24px;align-items:center;width:100%;max-width:460px;}
+#esug span{font-size:12px;padding:9px 18px;border-radius:var(--r-md);border:.5px solid var(--bd2);color:var(--t2);cursor:pointer;text-align:center;width:100%;transition:border-color .12s,color .12s;}
+#esug span:hover{border-color:#1D9E75;color:#1D9E75;}
+#built{padding:14px 18px;display:none;}
+.ai{animation:fi .3s ease both;}
+.building{display:flex;align-items:center;gap:5px;padding:48px 0;}
+.bdot{width:5px;height:5px;border-radius:50%;background:#1D9E75;animation:blink 1.4s infinite both;}
+.bdot:nth-child(2){animation-delay:.2s;}
+.bdot:nth-child(3){animation-delay:.4s;}
+.building span{font-size:11px;color:var(--t3);margin-left:5px;}
+.cecho{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border-radius:var(--r-md);margin-bottom:13px;border-left:2px solid #1D9E75;}
+.celbl{font-size:8px;text-transform:uppercase;letter-spacing:.6px;color:#1D9E75;font-weight:500;flex-shrink:0;}
+.cetxt{font-size:11px;color:var(--t2);font-style:italic;}
+.sstrip{display:flex;margin-bottom:13px;border-bottom:.5px solid var(--bd);padding-bottom:11px;}
+.sstat{flex:1;text-align:center;border-right:.5px solid var(--bd);padding:0 5px;}
+.sstat:last-child{border-right:none;}
+.ssn{font-size:20px;font-weight:500;color:var(--t1);}
+.ssl{font-size:9px;color:var(--t3);margin-top:1px;}
+.ssn-g{color:#1D9E75;}
+.crow{display:grid;grid-template-columns:56% 44%;gap:12px;margin-bottom:13px;align-items:start;}
+.cbox{background:var(--bg2);border-radius:var(--r-lg);padding:11px 13px;}
+.clbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:9px;font-weight:500;}
+.cwrap{height:160px;position:relative;}
+.htbl{background:var(--bg2);border-radius:var(--r-lg);overflow:hidden;}
+.htbl table{width:100%;border-collapse:collapse;}
+.htbl th{font-size:9px;font-weight:500;color:var(--t3);padding:7px 8px;text-align:right;border-bottom:.5px solid var(--bd);}
+.htbl th:first-child{text-align:left;}
+.htbl td{font-size:10px;color:var(--t1);padding:5px 8px;text-align:right;border-bottom:.5px solid var(--bd);}
+.htbl td:first-child{text-align:left;color:var(--t2);}
+.htbl tr:last-child td{border-bottom:none;}
+.tdg{color:#1D9E75;font-weight:500;}.tda{color:#A32D2D;}
+.irow2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.ing{background:#E1F5EE;padding:9px 11px;border-radius:var(--r-md);}
+.ing .it{font-size:10px;font-weight:500;color:#085041;margin-bottom:2px;}
+.ing .ib{font-size:10px;color:#0F6E56;line-height:1.45;}
+.ina{background:#FAEEDA;padding:9px 11px;border-radius:var(--r-md);}
+.ina .it{font-size:10px;font-weight:500;color:#633806;margin-bottom:2px;}
+.ina .ib{font-size:10px;color:#854F0B;line-height:1.45;}
+.aistmt{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:14px;line-height:1.4;}
+.zone{padding-left:12px;border-left:2px solid var(--bd);margin-bottom:12px;}
+.zr{border-left-color:#E24B4A;}.za{border-left-color:#EF9F27;}.zb{border-left-color:#378ADD;}
+.zlbl{font-size:8px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:500;margin-bottom:6px;}
+.aitem{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:.5px solid var(--bd);}
+.aitem:last-child{border-bottom:none;}
+.ainf{flex:1;}
+.an{font-size:12px;font-weight:500;color:var(--t1);}
+.am{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.35;}
+.ha{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--bg2);color:var(--t2);cursor:pointer;white-space:nowrap;user-select:none;}
+.ha:hover{color:var(--t1);}
+.ha-r{color:#A32D2D;}.ha-a{color:#854F0B;}
+.deal-card{background:var(--bg2);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:12px;}
+.dch{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dcico{width:30px;height:30px;border-radius:var(--r-md);background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#0F6E56;flex-shrink:0;}
+.dcn{font-size:13px;font-weight:500;color:var(--t1);}
+.dcm{font-size:10px;color:var(--t3);}
+.dca{margin-left:auto;text-align:right;}
+.dcan{font-size:16px;font-weight:500;color:var(--t1);}
+.dcas{font-size:10px;color:#1D9E75;}
+.dcst{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.dcsi{background:var(--bg);border-radius:var(--r-md);padding:7px 9px;text-align:center;}
+.dcsn{font-size:14px;font-weight:500;color:var(--t1);}
+.dcsl{font-size:9px;color:var(--t3);}
+.sec-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:500;margin-bottom:9px;}
+.pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+.pcard{background:var(--bg2);border-radius:var(--r-lg);padding:10px 12px;cursor:pointer;border:.5px solid transparent;transition:border-color .15s;}
+.pcard:hover{border-color:rgba(29,158,117,.25);}
+.pcard.sel{border-color:#1D9E75;}
+.pct{display:flex;align-items:center;gap:8px;}
+.pav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0;}
+.pinf{flex:1;min-width:0;}
+.pnm{font-size:12px;font-weight:500;color:var(--t1);}
+.pfm{font-size:10px;color:var(--t3);}
+.pmatch{font-size:10px;font-weight:500;padding:1px 5px;border-radius:3px;flex-shrink:0;}
+.pmh{background:#E1F5EE;color:#085041;}.pmm{background:#FAEEDA;color:#633806;}
+.preason{font-size:10px;color:var(--t3);margin-top:5px;line-height:1.35;}
+.pmsg{display:none;margin-top:9px;padding-top:9px;border-top:.5px solid var(--bd);}
+.pmsg-l{font-size:8px;text-transform:uppercase;letter-spacing:.6px;color:#1D9E75;margin-bottom:5px;}
+.pmsg-b{font-size:11px;color:var(--t2);line-height:1.65;white-space:pre-line;}
+.pmsg-s{display:inline-block;margin-top:7px;font-size:10px;padding:3px 10px;border-radius:var(--r-md);background:#1D9E75;color:white;cursor:pointer;}
+#cmd{flex-shrink:0;border-top:.5px solid var(--bd);padding:7px 16px 11px;}
+#chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;min-height:16px;}
+.chip{font-size:9px;padding:1px 6px;border-radius:3px;background:var(--bg2);color:var(--t3);cursor:pointer;}
+.chip:hover{color:var(--t2);}
+.irow{display:flex;gap:6px;align-items:center;}
+.iw{flex:1;position:relative;}
+#inp{width:100%;border:.5px solid var(--bd);border-radius:var(--r-md);padding:7px 32px 7px 12px;font-size:13px;font-family:var(--font);background:var(--bg2);color:var(--t1);outline:none;}
+.mic{position:absolute;right:9px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);display:flex;align-items:center;}
+.mic:hover{color:var(--t2);}
+.mic.on{color:#1D9E75;animation:micpulse .7s infinite;}
+.send{padding:0 14px;height:30px;border-radius:var(--r-md);background:#1D9E75;border:none;cursor:pointer;color:white;font-size:13px;font-family:var(--font);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hdr">
+    <span class="brand">Valt <em>OS</em></span>
+    <div class="hsp"></div>
+    <span id="ftag"></span>
+    <div class="alive"><div class="alit"></div></div>
+    <div class="av">RC</div>
+  </div>
+  <div id="content">
+    <div id="empty">
+      <p class="g1">Let's get to work.</p>
+      <p class="g2">How can I help?</p>
+      <div id="esug">
+        <span onclick="fire(0)">Walk me through my portfolio</span>
+        <span onclick="fire(1)">What should I focus on right now?</span>
+        <span onclick="fire(2)">Which deals should I be sharing with my network?</span>
+      </div>
+    </div>
+    <div id="built"></div>
+  </div>
+  <div id="cmd">
+    <div id="chips"></div>
+    <div class="irow">
+      <div class="iw">
+        <input id="inp" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')run()"/>
+        <span class="mic" id="mic" onclick="toggleMic()">
+          <svg width="12" height="14" viewBox="0 0 11 15" fill="none">
+            <rect x="3" y="0.5" width="5" height="7.5" rx="2.5" fill="currentColor"/>
+            <path d="M1 7.5C1 10.261 3.015 12.5 5.5 12.5C7.985 12.5 10 10.261 10 7.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+            <line x1="5.5" y1="12.5" x2="5.5" y2="14" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+            <line x1="3.2" y1="14" x2="7.8" y2="14" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
+      <button class="send" onclick="run()">→</button>
+    </div>
+  </div>
+</div>
+<script>
+let flow=null,ci=null,micTimer=null,micIdx=0;
+const MICS=['Walk me through my portfolio','What should I focus on right now?','Which deals should I be sharing with my network?'];
+function fire(n){document.getElementById('inp').value=MICS[n];run();}
+function fireT(t){document.getElementById('inp').value=t;run();}
+function run(){
+  const v=document.getElementById('inp').value.trim();
+  if(!v)return;
+  const lv=v.toLowerCase();
+  let nf;
+  if(lv.includes('portfolio')||lv.includes('holding')||lv.includes('performance')||lv.includes('return'))nf='portfolio';
+  else if(lv.includes('focus')||lv.includes('action')||lv.includes('right now')||lv.includes('today')||lv.includes('what should'))nf='actions';
+  else if(lv.includes('shar')||lv.includes('network')||lv.includes('deal')||lv.includes('who'))nf='network';
+  else nf='portfolio';
+  document.getElementById('inp').value='';
+  activate(nf);
+}
+function activate(nf){
+  flow=nf;
+  document.getElementById('empty').classList.add('hide');
+  document.getElementById('hdr').classList.add('vis');
+  const built=document.getElementById('built');
+  built.style.display='block';
+  built.innerHTML='<div class="building"><div class="bdot"></div><div class="bdot"></div><div class="bdot"></div><span>constructing view\u2026</span></div>';
+  const tags={portfolio:'portfolio overview',actions:'next best actions',network:'network opportunity'};
+  document.getElementById('ftag').textContent=tags[nf]||'';
+  const cs={portfolio:['What should I focus on?','Which deals to share?'],actions:['Walk me through my portfolio','Which deals to share?'],network:['Walk me through my portfolio','What should I focus on?']};
+  document.getElementById('chips').innerHTML=(cs[nf]||[]).map(c=>`<span class="chip" onclick="fireT('${c}')">${c}</span>`).join('');
+  setTimeout(()=>{
+    if(ci){ci.destroy();ci=null;}
+    if(nf==='portfolio')renderPortfolio();
+    else if(nf==='actions')renderActions();
+    else renderNetwork();
+  },640);
+}
+function echo(txt){return`<div class="cecho ai"><span class="celbl">command</span><span class="cetxt">"${txt}"</span></div>`;}
+function renderPortfolio(){
+  document.getElementById('built').innerHTML=echo('Walk me through my portfolio')+`
+  <div class="sstrip ai"><div class="sstat"><div class="ssn">$133M</div><div class="ssl">AUM</div></div><div class="sstat"><div class="ssn ssn-g">+8.3%</div><div class="ssl">Q1 2026 return</div></div><div class="sstat"><div class="ssn ssn-g">+4.1pp</div><div class="ssl">vs benchmark</div></div><div class="sstat"><div class="ssn">5</div><div class="ssl">active deals</div></div></div>
+  <div class="crow ai"><div class="cbox"><div class="clbl">6-month performance vs benchmark</div><div class="cwrap"><canvas id="pc"></canvas></div></div><div class="htbl"><table><tr><th>Position</th><th>IRR</th><th>MoIC</th><th>vs target</th></tr><tr><td>GreenHarbor</td><td class="tdg">22.1%</td><td>1.53\u00d7</td><td class="tdg">+7.1pp</td></tr><tr><td>ClearPath Tech</td><td class="tdg">18.6%</td><td>1.32\u00d7</td><td class="tdg">+3.6pp</td></tr><tr><td>NovaBridge</td><td class="tdg">14.2%</td><td>1.14\u00d7</td><td>&#8212;</td></tr><tr><td>Apex FinTech III</td><td>12.4%</td><td>1.40\u00d7</td><td class="tda">\u22120.6pp</td></tr><tr><td>Meridian Capital</td><td>n/a</td><td>1.01\u00d7</td><td>&#8212;</td></tr></table></div></div>
+  <div class="irow2 ai"><div class="ing"><div class="it">GreenHarbor is carrying the portfolio</div><div class="ib">+22.1% IRR. Q2 revenue up 40% YoY. Climate policy tailwind accelerating. Consider follow-on before the round closes.</div></div><div class="ina"><div class="it">Climate underweight vs target</div><div class="ib">22% current vs 25% target. GreenHarbor follow-on ($3.5M) would close the gap. Three network partners have expressed climate interest this quarter.</div></div></div>`;
+  initChart();
+}
+function initChart(){
+  if(!window.Chart){setTimeout(initChart,120);return;}
+  const c=document.getElementById('pc');if(!c)return;
+  if(ci){ci.destroy();ci=null;}
+  const dk=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const gc=dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)';
+  const tc=dk?'rgba(255,255,255,0.28)':'rgba(0,0,0,0.26)';
+  ci=new Chart(c,{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Portfolio',data:[0,2.1,4.8,3.2,6.4,8.3],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1D9E75',tension:.35,fill:true},{label:'Benchmark',data:[0,1.2,2.1,0.8,3.1,4.2],borderColor:dk?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.35,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,boxHeight:2,font:{size:9},color:tc,padding:8}},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: +${ctx.raw}%`},backgroundColor:'rgba(18,18,18,0.92)',titleFont:{size:10},bodyFont:{size:10},padding:7,cornerRadius:4}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9}},border:{display:false}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:v=>`${v}%`},border:{display:false}}}}});
+}
+function renderActions(){
+  document.getElementById('built').innerHTML=echo('What should I focus on right now?')+`
+  <p class="aistmt ai">Three things need your attention before Friday. Two of them have hard deadlines.</p>
+  <div class="zone zr ai"><div class="zlbl">Act today</div><div class="aitem"><div class="ainf"><div class="an">Meridian Capital \u2014 counter or close</div><div class="am">Term sheet expires Friday \u00b7 Marcus Chen viewed deck 3\u00d7 \u00b7 2 non-market clauses to push back on \u00b7 $18M Series B</div></div><span class="ha ha-r">draft counter \u2192</span></div><div class="aitem"><div class="ainf"><div class="an">CPPIB \u2014 LP relationship at risk</div><div class="am">47 days no contact \u00b7 Q1 portfolio update overdue \u00b7 draft ready from portfolio data</div></div><span class="ha ha-r">review draft \u2192</span></div></div>
+  <div class="zone za ai"><div class="zlbl">This week</div><div class="aitem"><div class="ainf"><div class="an">Apex co-invest \u2014 decide by Friday</div><div class="am">FinTech Series A \u00b7 $8M \u00b7 Sarah Chen deal lead \u00b7 window closing</div></div><span class="ha ha-a">decide \u2192</span></div><div class="aitem"><div class="ainf"><div class="an">3 inbound deals \u2014 first pass needed</div><div class="am">GreenHarbor follow-on screened as strong thesis match \u00b7 2 others below threshold</div></div><span class="ha ha-a">review \u2192</span></div></div>
+  <div class="zone zb ai"><div class="zlbl">Relationship windows open now</div><div class="aitem"><div class="ainf"><div class="an">Origin Partners fund close \u2014 warm window</div><div class="am">Michael Tanaka \u00b7 $240M close announced \u00b7 7-day window before it cools</div></div><span class="ha">reach out \u2192</span></div><div class="aitem"><div class="ainf"><div class="an">BlackRock PE Director joined Valt</div><div class="am">2nd-degree via Sarah Chen \u00b7 auto-intro available \u00b7 new member window</div></div><span class="ha">intro \u2192</span></div></div>`;
+}
+const PARTNERS=[
+  {id:'sc',i:'SC',bg:'#9FE1CB',col:'#085041',nm:'Sarah Chen',fm:'Apex Capital Partners',pct:94,cls:'pmh',why:'Climate allocation target for 2026. Co-invested on similar stage deal last cycle. Active deployment window.',msg:'Sarah,\n\nWanted to flag a follow-on we\'re looking at \u2014 GreenHarbor Climate Tech, $3.5M. Up 40% revenue YoY, strong policy tailwind.\n\nKnowing your climate targets for 2026, thought this might be worth a look. Happy to send the deck.\n\nRobert'},
+  {id:'jm',i:'JM',bg:'#EEEDFE',col:'#3C3489',nm:'James Morrison',fm:'Morrison Family Office',pct:87,cls:'pmh',why:'ESG mandate active. Viewed two similar opportunities this quarter. Currently deploying from 2024 vehicle.',msg:'James,\n\nFollowing up on your ESG interest \u2014 there\'s a climate tech follow-on I think fits your mandate. GreenHarbor, $3.5M, growing fast.\n\nAre you looking at climate this quarter?\n\nRobert'},
+  {id:'mt',i:'MT',bg:'#F5C4B3',col:'#712B13',nm:'Michael Tanaka',fm:'Origin Partners',pct:82,cls:'pmh',why:'Just closed $240M fund. Deploying in climate and infra per fund thesis. Warm relationship window open.',msg:'Michael,\n\nCongratulations on the fund close.\n\nHave a climate tech follow-on you might want to look at while you\'re deploying. GreenHarbor, $3.5M. Happy to share details.\n\nRobert'},
+  {id:'kw',i:'KW',bg:'#B5D4F4',col:'#0C447C',nm:'Kevin Walsh',fm:'Blackstone PE',pct:71,cls:'pmm',why:'Infra team added climate allocation in Q4 2025. 2nd-degree via Sarah Chen. Requires warm intro first.',msg:'Kevin,\n\nRobert Cheung here \u2014 Sarah Chen suggested I reach out. We\'re looking at a climate infrastructure follow-on (GreenHarbor, $3.5M) that may fit Blackstone\'s new climate allocation.\n\nWorth a brief conversation?\n\nRobert'}
+];
+function selP(id){
+  PARTNERS.forEach(p=>{
+    const m=document.getElementById('pm-'+p.id);
+    const c=document.getElementById('pc-'+p.id);
+    if(!m||!c)return;
+    if(p.id===id){const open=m.style.display==='block';m.style.display=open?'none':'block';c.classList.toggle('sel',!open);}
+    else{m.style.display='none';c.classList.remove('sel');}
+  });
+}
+function renderNetwork(){
+  const pg=PARTNERS.map(p=>`<div class="pcard" id="pc-${p.id}" onclick="selP('${p.id}')"><div class="pct"><div class="pav" style="background:${p.bg};color:${p.col};">${p.i}</div><div class="pinf"><div class="pnm">${p.nm}</div><div class="pfm">${p.fm}</div></div><span class="pmatch ${p.cls}">${p.pct}%</span></div><div class="preason">${p.why}</div><div class="pmsg" id="pm-${p.id}"><div class="pmsg-l">Draft message</div><div class="pmsg-b">${p.msg}</div><span class="pmsg-s">Send</span></div></div>`).join('');
+  document.getElementById('built').innerHTML=echo('Which deals should I be sharing with my network?')+`
+  <div class="deal-card ai"><div class="dch"><div class="dcico">GH</div><div><div class="dcn">GreenHarbor Climate Tech</div><div class="dcm">Series B-extension \u00b7 Climate infrastructure \u00b7 SF-based</div></div><div class="dca"><div class="dcan">$3.5M</div><div class="dcas">allocation available</div></div></div><div class="dcst"><div class="dcsi"><div class="dcsn">+40%</div><div class="dcsl">YoY revenue growth</div></div><div class="dcsi"><div class="dcsn">22.1%</div><div class="dcsl">current IRR</div></div><div class="dcsi"><div class="dcsn">1.53\u00d7</div><div class="dcsl">current multiple</div></div></div></div>
+  <div class="sec-lbl ai">Affinity-matched partners \u2014 click any to draft a message</div>
+  <div class="pgrid ai">${pg}</div>`;
+}
+function toggleMic(){
+  const btn=document.getElementById('mic'),inp=document.getElementById('inp');
+  if(micTimer){clearTimeout(micTimer);micTimer=null;btn.classList.remove('on');inp.placeholder='Ask anything\u2026';return;}
+  btn.classList.add('on');inp.placeholder='listening\u2026';inp.value='';
+  micTimer=setTimeout(()=>{
+    inp.value=MICS[micIdx%MICS.length];micIdx++;
+    btn.classList.remove('on');inp.placeholder='Ask anything\u2026';micTimer=null;
+    setTimeout(run,400);
+  },1500);
+}
+</script>
+</body>
+</html>
