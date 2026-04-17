@@ -13,24 +13,11 @@
   --r-md:8px;--r-lg:12px;
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
 }
-[data-theme="dark"]{
+@media(prefers-color-scheme:dark){:root{
   --bg:#141412;--bg2:#1e1e1b;--bg3:#272724;
   --t1:#f0efe8;--t2:#8a8a82;--t3:#4e4e48;
   --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.14);
-}
-[data-theme="dark"] .ing{background:#0F2E24;}
-[data-theme="dark"] .ing .it{color:#5DCAA5;}
-[data-theme="dark"] .ing .ib{color:#7EDBB8;}
-[data-theme="dark"] .ina{background:#2E2410;}
-[data-theme="dark"] .ina .it{color:#EFC06E;}
-[data-theme="dark"] .ina .ib{color:#D4A54E;}
-[data-theme="dark"] .av{background:#2E2B45;color:#A9A3E0;}
-[data-theme="dark"] .ha-r{color:#E8807F;}
-[data-theme="dark"] .ha-a{color:#D4A54E;}
-[data-theme="dark"] .pmh{background:#0F2E24;color:#5DCAA5;}
-[data-theme="dark"] .pmm{background:#2E2410;color:#EFC06E;}
-[data-theme="dark"] .tdg{color:#5DCAA5;}
-[data-theme="dark"] .tda{color:#E8807F;}
+}}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:var(--font);background:var(--bg3);display:flex;align-items:center;justify-content:center;padding:20px;}
@@ -48,15 +35,6 @@ body{font-family:var(--font);background:var(--bg3);display:flex;align-items:cent
 .alive{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);margin-right:8px;}
 .alit{width:5px;height:5px;border-radius:50%;background:#1D9E75;animation:pulse 2.4s infinite;}
 .av{width:18px;height:18px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:500;color:#3C3489;}
-.theme-toggle{
-  display:flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:50%;cursor:pointer;
-  background:var(--bg2);border:none;
-  color:var(--t3);margin-right:8px;
-  transition:background .2s,color .2s;
-}
-.theme-toggle:hover{color:var(--t2);}
-.theme-toggle svg{width:12px;height:12px;}
 #content{flex:1;overflow-y:auto;position:relative;}
 #empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .25s;}
 #empty.hide{opacity:0;pointer-events:none;}
@@ -160,7 +138,6 @@ body{font-family:var(--font);background:var(--bg3);display:flex;align-items:cent
     <span class="brand" onclick="reset()" style="cursor:pointer;" title="Back to start">Valt <em>OS</em></span>
     <div class="hsp"></div>
     <span id="ftag"></span>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode"></button>
     <div class="alive"><div class="alit"></div></div>
     <div class="av">RC</div>
   </div>
@@ -195,22 +172,6 @@ body{font-family:var(--font);background:var(--bg3);display:flex;align-items:cent
   </div>
 </div>
 <script>
-/* ── Theme ── */
-const SUN=`<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.2"/><line x1="8" y1="1" x2="8" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="1" y1="8" x2="3" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="13" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-const MOON=`<svg viewBox="0 0 16 16" fill="none"><path d="M13.5 9.5a5.5 5.5 0 01-7-7A5.5 5.5 0 108 14a5.48 5.48 0 005.5-4.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-function getTheme(){const s=localStorage.getItem('valt-theme2');return s||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');}
-function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('themeToggle').innerHTML=t==='dark'?SUN:MOON;
-  if(ci)initChart();
-}
-function toggleTheme(){
-  const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-  localStorage.setItem('valt-theme2',next);
-  applyTheme(next);
-}
-applyTheme(getTheme());
-
 let flow=null,ci=null,micTimer=null,micIdx=0;
 const MICS=['Walk me through my portfolio','What should I focus on right now?','Which deals should I be sharing with my network?'];
 function fire(n){document.getElementById('inp').value=MICS[n];run();}
@@ -246,7 +207,6 @@ function activate(nf){
   },640);
 }
 function echo(txt){return`<div class="cecho ai"><span class="celbl">command</span><span class="cetxt">"${txt}"</span></div>`;}
-function dk(){return document.documentElement.getAttribute('data-theme')==='dark';}
 function renderPortfolio(){
   document.getElementById('built').innerHTML=echo('Walk me through my portfolio')+`
   <div class="sstrip ai"><div class="sstat"><div class="ssn">$133M</div><div class="ssl">AUM</div></div><div class="sstat"><div class="ssn ssn-g">+8.3%</div><div class="ssl">Q1 2026 return</div></div><div class="sstat"><div class="ssn ssn-g">+4.1pp</div><div class="ssl">vs benchmark</div></div><div class="sstat"><div class="ssn">5</div><div class="ssl">active deals</div></div></div>
@@ -258,10 +218,10 @@ function initChart(){
   if(!window.Chart){setTimeout(initChart,120);return;}
   const c=document.getElementById('pc');if(!c)return;
   if(ci){ci.destroy();ci=null;}
-  const d=dk();
-  const gc=d?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)';
-  const tc=d?'rgba(255,255,255,0.28)':'rgba(0,0,0,0.26)';
-  ci=new Chart(c,{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Portfolio',data:[0,2.1,4.8,3.2,6.4,8.3],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1D9E75',tension:.35,fill:true},{label:'Benchmark',data:[0,1.2,2.1,0.8,3.1,4.2],borderColor:d?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.35,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,boxHeight:2,font:{size:9},color:tc,padding:8}},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: +${ctx.raw}%`},backgroundColor:'rgba(18,18,18,0.92)',titleFont:{size:10},bodyFont:{size:10},padding:7,cornerRadius:4}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9}},border:{display:false}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:v=>`${v}%`},border:{display:false}}}}});
+  const dk=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const gc=dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)';
+  const tc=dk?'rgba(255,255,255,0.28)':'rgba(0,0,0,0.26)';
+  ci=new Chart(c,{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Portfolio',data:[0,2.1,4.8,3.2,6.4,8.3],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1D9E75',tension:.35,fill:true},{label:'Benchmark',data:[0,1.2,2.1,0.8,3.1,4.2],borderColor:dk?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.35,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,boxHeight:2,font:{size:9},color:tc,padding:8}},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: +${ctx.raw}%`},backgroundColor:'rgba(18,18,18,0.92)',titleFont:{size:10},bodyFont:{size:10},padding:7,cornerRadius:4}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9}},border:{display:false}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:v=>`${v}%`},border:{display:false}}}}});
 }
 function renderActions(){
   document.getElementById('built').innerHTML=echo('What should I focus on right now?')+`
